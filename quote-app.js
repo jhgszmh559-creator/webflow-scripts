@@ -1,8 +1,16 @@
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+<script type="text/babel">
 (() => {
   const { useState, useEffect, useMemo, useRef } = React;
 
   // =========================
-  // ERROR BOUNDARY
+  // ERROR BOUNDARY (Safety Net)
   // =========================
   class ErrorBoundary extends React.Component {
       constructor(props) {
@@ -19,12 +27,9 @@
           if (this.state.hasError) {
               return (
                   <div className="tw-p-8 tw-m-8 tw-bg-red-50 tw-rounded-xl tw-border tw-border-red-200 tw-font-sans">
-                      <h1 className="tw-text-2xl tw-font-bold tw-text-red-700 tw-mb-2">Something went wrong on Screen 2.</h1>
-                      <p className="tw-text-red-600 tw-mb-6">Please take a screenshot of this error and send it back to me so I can fix it instantly:</p>
+                      <h1 className="tw-text-2xl tw-font-bold tw-text-red-700 tw-mb-2">App Error</h1>
                       <pre className="tw-bg-white tw-p-4 tw-rounded-lg tw-border tw-border-red-100 tw-overflow-auto tw-text-sm tw-text-slate-800 tw-whitespace-pre-wrap">
-                          <span className="tw-font-bold">{this.state.error && this.state.error.toString()}</span>
-                          <br /><br />
-                          {this.state.errorInfo && this.state.errorInfo.componentStack}
+                          {this.state.error && this.state.error.toString()}
                       </pre>
                   </div>
               );
@@ -150,7 +155,7 @@
       </div> 
   );
 
-  // MISSING CURRENCY SELECTOR COMPONENT ADDED BACK HERE
+  // ---> THE MISSING CURRENCY SELECTOR IS BACK <---
   const CurrencySelector = ({ label, ...props }) => ( 
       <div> 
           <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label> 
@@ -449,7 +454,7 @@
           }
 
           const htmlTemplate = `
-              <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; width: 100%; color: #333;">
+              <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #ffffff; width: 100%; padding: 40px; box-sizing: border-box; color: #333;">
                   
                   <div style="margin-bottom: 50px;">
                       ${companyLogoUrl ? `<img src="${companyLogoUrl}" style="width: 120px; height: auto; margin-bottom: 24px;" crossorigin="anonymous" />` : ''}
@@ -512,11 +517,11 @@
           document.body.appendChild(tempContainer); 
           
           const opt = {
-              margin: [0.5, 0.5, 0.5, 0.5], 
+              margin: 0, 
               filename: `${quoteInfo.number || 'invoice'}.pdf`,
               image: { type: "jpeg", quality: 1 },
               html2canvas: { scale: 2, useCORS: true },
-              jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+              jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
           };
 
           await window.html2pdf().set(opt).from(tempContainer).save();
@@ -867,3 +872,4 @@
       root.render(<App />);
   }
 })();
+</script>
