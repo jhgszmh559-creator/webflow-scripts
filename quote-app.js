@@ -2,7 +2,7 @@
   const { useState, useEffect, useMemo, useRef } = React;
 
   // =========================
-  // ERROR BOUNDARY (Catches screen crashes)
+  // ERROR BOUNDARY
   // =========================
   class ErrorBoundary extends React.Component {
       constructor(props) {
@@ -69,7 +69,7 @@
   // ICONS & DATA
   // =========================
   const Icon = ({ size = 20, children, className = '' }) => (
-      <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
   );
   const UserIcon = ({ size }) => <Icon size={size}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></Icon>;
   const Briefcase = ({ size }) => <Icon size={size}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></Icon>;
@@ -93,15 +93,15 @@
   ];
 
   const CATEGORIES = {
-      'Hotel': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e2985d359178f0c0_Screenshot%202026-01-10%20at%2015.04.44.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e2985d359178f0c0_Screenshot%202026-01-10%20at%2015.04.44.png)',
-      'Air': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a508dce6a0a372d70_Screenshot%202026-01-10%20at%2015.05.03.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a508dce6a0a372d70_Screenshot%202026-01-10%20at%2015.05.03.png)',
-      'Cruise': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a254adfe5df568f88_Screenshot%202026-01-10%20at%2015.05.12.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a254adfe5df568f88_Screenshot%202026-01-10%20at%2015.05.12.png)',
-      'DMC': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0acc385e79edb1d0c0_Screenshot%202026-01-10%20at%2015.05.22.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0acc385e79edb1d0c0_Screenshot%202026-01-10%20at%2015.05.22.png)',
-      'Tour Op/Wholesaler': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0992dc54bde7c1a4e3_Screenshot%202026-01-10%20at%2015.05.27.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0992dc54bde7c1a4e3_Screenshot%202026-01-10%20at%2015.05.27.png)',
-      'Activity provider': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0ac7bab2a2adb85387_Screenshot%202026-01-10%20at%2015.05.36.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0ac7bab2a2adb85387_Screenshot%202026-01-10%20at%2015.05.36.png)',
-      'Transport': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a3acbc928a3a1e16a_Screenshot%202026-01-10%20at%2015.05.46.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a3acbc928a3a1e16a_Screenshot%202026-01-10%20at%2015.05.46.png)',
-      'Insurance': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e1650e33c97305f8_Screenshot%202026-01-10%20at%2015.05.59.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e1650e33c97305f8_Screenshot%202026-01-10%20at%2015.05.59.png)',
-      'Homes & Villas': '[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0afd98092bed806be7_Screenshot%202026-01-10%20at%2015.06.07.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0afd98092bed806be7_Screenshot%202026-01-10%20at%2015.06.07.png)'
+      'Hotel': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e2985d359178f0c0_Screenshot%202026-01-10%20at%2015.04.44.png',
+      'Air': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a508dce6a0a372d70_Screenshot%202026-01-10%20at%2015.05.03.png',
+      'Cruise': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a254adfe5df568f88_Screenshot%202026-01-10%20at%2015.05.12.png',
+      'DMC': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0acc385e79edb1d0c0_Screenshot%202026-01-10%20at%2015.05.22.png',
+      'Tour Op/Wholesaler': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0992dc54bde7c1a4e3_Screenshot%202026-01-10%20at%2015.05.27.png',
+      'Activity provider': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0ac7bab2a2adb85387_Screenshot%202026-01-10%20at%2015.05.36.png',
+      'Transport': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a3acbc928a3a1e16a_Screenshot%202026-01-10%20at%2015.05.46.png',
+      'Insurance': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e1650e33c97305f8_Screenshot%202026-01-10%20at%2015.05.59.png',
+      'Homes & Villas': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0afd98092bed806be7_Screenshot%202026-01-10%20at%2015.06.07.png'
   };
 
   // =========================
@@ -147,6 +147,16 @@
               {symbol && <span className={`tw-absolute tw-left-2 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400 ${symbol === '%' ? 'tw-right-2 tw-left-auto' : ''}`}>{symbol}</span>} 
               <input {...props} className={`tw-w-full tw-text-sm tw-p-1.5 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-1 focus:tw-ring-[#303350] focus:tw-border-[#303350] ${symbol && symbol !== '%' ? 'tw-pl-6' : ''} ${symbol === '%' ? 'tw-pr-6 tw-text-right' : ''}`} /> 
           </div> 
+      </div> 
+  );
+
+  // MISSING CURRENCY SELECTOR COMPONENT ADDED BACK HERE
+  const CurrencySelector = ({ label, ...props }) => ( 
+      <div> 
+          <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label> 
+          <select {...props} className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] tw-bg-white"> 
+              {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)} 
+          </select> 
       </div> 
   );
 
@@ -238,12 +248,12 @@
                               <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">1. Choose Pricing Model</label>
                               <div className="tw-grid tw-grid-cols-2 tw-gap-6">
                                   <div onClick={() => setPricingModel('nett')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'nett' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-slate-50/50 tw-border-slate-200 hover:tw-border-slate-300'}`}>
-                                      <img src="[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png)" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
+                                      <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'nett' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Nett Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the cost to you (nett) and add your markup.</p>
                                   </div>
                                   <div onClick={() => setPricingModel('gross')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'gross' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-slate-50/50 tw-border-slate-200 hover:tw-border-slate-300'}`}>
-                                      <img src="[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png)" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
+                                      <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'gross' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Gross Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the final client price (gross) and your commission.</p>
                                   </div>
@@ -292,7 +302,7 @@
           { id: Date.now(), supplierId: "", category: "Hotel", description: '', nettUnitCost: 0, quantity: 1, markup: 20 }
       ]);
       
-      const [companyLogoUrl, setCompanyLogoUrl] = useState('[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/656cb820cffdc2c79973770f_Group%202.png](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/656cb820cffdc2c79973770f_Group%202.png)');
+      const [companyLogoUrl, setCompanyLogoUrl] = useState('https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/656cb820cffdc2c79973770f_Group%202.png');
       const [quoteInfo, setQuoteInfo] = useState({ number: `Q-${Date.now().toString().slice(-6)}`, date: new Date().toISOString().split('T')[0], dueDate: '' });
       
       const [currencySettings, setCurrencySettings] = useState({ base: 'USD', client: 'EUR', rate: 0.93 });
@@ -528,7 +538,7 @@
                   <div className="lg:tw-col-span-2 tw-space-y-6">
                       
                       <ControlCard title="Branding" defaultOpen={false}>
-                          <InputField label="Company Logo URL" value={companyLogoUrl} onChange={(e) => setCompanyLogoUrl(e.target.value)} placeholder="[https://your-website.com/logo.png](https://your-website.com/logo.png)" />
+                          <InputField label="Company Logo URL" value={companyLogoUrl} onChange={(e) => setCompanyLogoUrl(e.target.value)} placeholder="https://your-website.com/logo.png" />
                       </ControlCard>
 
                       <ControlCard title="Details">
@@ -829,7 +839,7 @@
       if (loading) return (
         <div className="tw-min-h-[70vh] tw-flex tw-items-center tw-justify-center">
           <lottie-player 
-            src="[https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/65afedc751a231c6ae634164_Animation%20-%201706028438496.json](https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/65afedc751a231c6ae634164_Animation%20-%201706028438496.json)" 
+            src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/65afedc751a231c6ae634164_Animation%20-%201706028438496.json" 
             background="transparent" 
             speed="1" 
             style={{ width: '450px', height: '450px' }} 
