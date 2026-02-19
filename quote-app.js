@@ -1,15 +1,42 @@
-
 (() => {
   const { useState, useEffect, useMemo, useRef } = React;
 
   // =========================
+  // ERROR BOUNDARY (Catches white-screen crashes)
+  // =========================
+  class ErrorBoundary extends React.Component {
+      constructor(props) {
+          super(props);
+          this.state = { hasError: false, error: null, errorInfo: null };
+      }
+      static getDerivedStateFromError(error) {
+          return { hasError: true, error: error };
+      }
+      componentDidCatch(error, errorInfo) {
+          this.setState({ errorInfo });
+      }
+      render() {
+          if (this.state.hasError) {
+              return (
+                  <div className="tw-p-8 tw-m-8 tw-bg-red-50 tw-rounded-xl tw-border tw-border-red-200 tw-font-sans">
+                      <h1 className="tw-text-2xl tw-font-bold tw-text-red-700 tw-mb-2">Something went wrong on Screen 2.</h1>
+                      <p className="tw-text-red-600 tw-mb-6">Please take a screenshot of this error and send it back to me so I can fix it instantly:</p>
+                      <pre className="tw-bg-white tw-p-4 tw-rounded-lg tw-border tw-border-red-100 tw-overflow-auto tw-text-sm tw-text-slate-800 tw-whitespace-pre-wrap">
+                          <span className="tw-font-bold">{this.state.error && this.state.error.toString()}</span>
+                          <br /><br />
+                          {this.state.errorInfo && this.state.errorInfo.componentStack}
+                      </pre>
+                  </div>
+              );
+          }
+          return this.props.children;
+      }
+  }
+
+  // =========================
   // WIZED CONFIG & HELPERS
   // =========================
-  const WIZED_REQ = {
-      clients: "load_clients",
-      suppliers: "load_suppliers",
-  };
-
+  const WIZED_REQ = { clients: "load_clients", suppliers: "load_suppliers" };
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   async function waitForWizedReady({ timeoutMs = 15000 } = {}) {
       const start = Date.now();
@@ -27,19 +54,17 @@
           const req = Wized?.data?.r?.[reqName];
           if (req && req.hasRequested && !req.isRequesting) {
               if (req.ok) return req.data;
-              throw new Error(`Wized request '${reqName}' failed`);
+              throw new Error(`Wized request failed`);
           }
           await sleep(50);
       }
-      throw new Error(`Timed out waiting for '${reqName}'`);
+      throw new Error(`Timeout`);
   }
 
   // =========================
   // ICONS & DATA
   // =========================
-  const Icon = ({ size = 20, children, className = '' }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
-  );
+  const Icon = ({ size = 20, children, className = '' }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>;
   const UserIcon = ({ size }) => <Icon size={size}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></Icon>;
   const Briefcase = ({ size }) => <Icon size={size}><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></Icon>;
   const Hash = ({ size }) => <Icon size={size}><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></Icon>;
@@ -51,16 +76,8 @@
   const Plus = ({ size }) => <Icon size={size}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></Icon>;
   const Trash2 = ({ size }) => <Icon size={size}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></Icon>;
 
-  const CURRENCIES = [
-      { code: 'USD', symbol: '$', name: 'US Dollar' }, { code: 'EUR', symbol: '€', name: 'Euro' }, { code: 'GBP', symbol: '£', name: 'British Pound' }, { code: 'JPY', symbol: '¥', name: 'Japanese Yen' }, { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' }, { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' }, { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' }, { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' }, { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' }, { code: 'ZAR', symbol: 'R', name: 'South African Rand' }
-  ];
-
-  const PRESET_BANK_ACCOUNTS = [
-      { id: 'default', name: 'GBP Account (Default)', details: 'Cartology Travel Ltd\nAddress: 17 Dorien Road, London, SW20 8EL\nBarclays Bank\nSort: 20-45-45\nAcc: 80285463\nIBAN: GB32BUKB20454580285463\nSwift: BUKBGB22' },
-      { id: 'usd', name: 'USD Account', details: 'Cartology Travel Ltd\nBarclays Bank\nSort: 20-45-45\nAcc: 65546399\nIBAN: GB38BUKB20454565546399' },
-      { id: 'eur', name: 'EUR Account', details: 'Cartology Travel Ltd\nSort: 20-45-45\nAcc: 56279911\nIBAN: GB10 BUKB 20454556279911' }
-  ];
-
+  const CURRENCIES = [{ code: 'USD', symbol: '$', name: 'US Dollar' }, { code: 'EUR', symbol: '€', name: 'Euro' }, { code: 'GBP', symbol: '£', name: 'British Pound' }, { code: 'JPY', symbol: '¥', name: 'Yen' }, { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' }, { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' }, { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' }];
+  const PRESET_BANK_ACCOUNTS = [{ id: 'default', name: 'GBP Account (Default)', details: 'Cartology Travel Ltd\nAddress: 17 Dorien Road, London\nSort: 20-45-45\nAcc: 80285463\nIBAN: GB32BUKB20454580285463' }, { id: 'usd', name: 'USD Account', details: 'Cartology Travel Ltd\nSort: 20-45-45\nAcc: 65546399\nIBAN: GB38BUKB20454565546399' }, { id: 'eur', name: 'EUR Account', details: 'Cartology Travel Ltd\nSort: 20-45-45\nAcc: 56279911\nIBAN: GB10 BUKB 20454556279911' }];
   const CATEGORIES = {
       'Hotel': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d09e2985d359178f0c0_Screenshot%202026-01-10%20at%2015.04.44.png',
       'Air': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0a508dce6a0a372d70_Screenshot%202026-01-10%20at%2015.05.03.png',
@@ -73,50 +90,38 @@
       'Homes & Villas': 'https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/69620d0afd98092bed806be7_Screenshot%202026-01-10%20at%2015.06.07.png'
   };
 
-  // =========================
-  // REUSABLE UI COMPONENTS
-  // =========================
   const ControlCard = ({ title, children, defaultOpen = true }) => {
       const [isOpen, setIsOpen] = useState(defaultOpen);
       return (
-          <div className="tw-bg-white tw-rounded-xl tw-shadow-sm tw-border tw-border-slate-200 tw-overflow-hidden"> 
-              <div 
-                  className="tw-p-6 tw-flex tw-justify-between tw-items-center tw-cursor-pointer hover:tw-bg-slate-50 tw-transition-colors"
-                  onClick={() => setIsOpen(!isOpen)}
-              >
-                  <h2 className="tw-text-xl tw-font-bold tw-text-slate-800">{title}</h2>
-                  <div className="tw-text-slate-400">
-                      {isOpen ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
-                  </div>
-              </div>
-              {isOpen && (
-                  <div className="tw-p-6 tw-pt-0 tw-border-t tw-border-slate-100 tw-mt-2">
-                      {children}
-                  </div>
-              )}
-          </div> 
+        <div className="tw-bg-white tw-rounded-xl tw-shadow-sm tw-border tw-border-slate-200 tw-overflow-hidden"> 
+            <div className="tw-p-6 tw-flex tw-justify-between tw-items-center tw-cursor-pointer hover:tw-bg-slate-50 tw-transition-colors" onClick={() => setIsOpen(!isOpen)}>
+                <h2 className="tw-text-xl tw-font-bold tw-text-slate-800">{title}</h2>
+                <div className="tw-text-slate-400">{isOpen ? <ArrowUp size={20} /> : <ArrowDown size={20} />}</div>
+            </div>
+            {isOpen && <div className="tw-p-6 tw-pt-0 tw-border-t tw-border-slate-100 tw-mt-2">{children}</div>}
+        </div> 
       );
   };
 
   const InputField = ({ label, symbol, icon, ...props }) => (
-      <div>
-          <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label>
-          <div className="tw-relative">
-              {icon && <span className="tw-absolute tw-left-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{icon}</span>}
-              <input {...props} className={`tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] disabled:tw-bg-slate-100 disabled:tw-cursor-not-allowed ${icon ? 'tw-pl-9' : ''} ${symbol ? 'tw-pr-9' : ''}`} />
-              {symbol && <span className="tw-absolute tw-right-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{symbol}</span>}
-          </div>
-      </div>
+    <div>
+        <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label>
+        <div className="tw-relative">
+            {icon && <span className="tw-absolute tw-left-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{icon}</span>}
+            <input {...props} className={`tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] disabled:tw-bg-slate-100 disabled:tw-cursor-not-allowed ${icon ? 'tw-pl-9' : ''} ${symbol ? 'tw-pr-9' : ''}`} />
+            {symbol && <span className="tw-absolute tw-right-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{symbol}</span>}
+        </div>
+    </div>
   );
 
   const MiniInputField = ({ label, symbol, ...props }) => ( 
-      <div> 
-          <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500">{label}</label> 
-          <div className="tw-relative tw-mt-1"> 
-              {symbol && <span className={`tw-absolute tw-left-2 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400 ${symbol === '%' ? 'tw-right-2 tw-left-auto' : ''}`}>{symbol}</span>} 
-              <input {...props} className={`tw-w-full tw-text-sm tw-p-1.5 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-1 focus:tw-ring-[#303350] focus:tw-border-[#303350] ${symbol && symbol !== '%' ? 'tw-pl-6' : ''} ${symbol === '%' ? 'tw-pr-6 tw-text-right' : ''}`} /> 
-          </div> 
-      </div> 
+    <div> 
+        <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500">{label}</label> 
+        <div className="tw-relative tw-mt-1"> 
+            {symbol && <span className={`tw-absolute tw-left-2 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400 ${symbol === '%' ? 'tw-right-2 tw-left-auto' : ''}`}>{symbol}</span>} 
+            <input {...props} className={`tw-w-full tw-text-sm tw-p-1.5 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-1 focus:tw-ring-[#303350] focus:tw-border-[#303350] ${symbol && symbol !== '%' ? 'tw-pl-6' : ''} ${symbol === '%' ? 'tw-pr-6 tw-text-right' : ''}`} /> 
+        </div> 
+    </div> 
   );
 
   function SearchableSelect({ options, value, onChange, placeholder, icon, emptyLabel = "+ Add new item" }) {
@@ -137,33 +142,13 @@
       return (
           <div className="tw-relative" ref={ref}>
               {icon && <span className="tw-absolute tw-left-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{icon}</span>}
-              <input 
-                  type="text" 
-                  className={`tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] tw-bg-white ${icon ? 'tw-pl-9' : ''}`}
-                  placeholder={placeholder}
-                  value={displayValue}
-                  onChange={(e) => { setQuery(e.target.value); setIsOpen(true); if(!isOpen) onChange(""); }}
-                  onFocus={() => { setIsOpen(true); setQuery(''); }}
-              />
+              <input type="text" className={`tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] tw-bg-white ${icon ? 'tw-pl-9' : ''}`} placeholder={placeholder} value={displayValue} onChange={(e) => { setQuery(e.target.value); setIsOpen(true); if(!isOpen) onChange(""); }} onFocus={() => { setIsOpen(true); setQuery(''); }} />
               {isOpen && (
                   <div className="tw-absolute tw-z-50 tw-w-full tw-mt-1 tw-bg-white tw-border tw-border-slate-200 tw-rounded-md tw-shadow-lg tw-max-h-60 tw-overflow-auto">
                       {filteredOptions.length === 0 ? (
-                          <div 
-                              className="tw-p-3 tw-text-sm tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-50"
-                              onClick={() => { alert("Trigger Wized flow to create new item here."); setIsOpen(false); }}
-                          >
-                              {emptyLabel}
-                          </div>
+                          <div className="tw-p-3 tw-text-sm tw-text-blue-600 tw-font-medium tw-cursor-pointer hover:tw-bg-blue-50" onClick={() => { alert("Trigger Wized flow to create new item here."); setIsOpen(false); }}>{emptyLabel}</div>
                       ) : (
-                          filteredOptions.map(opt => (
-                              <div 
-                                  key={opt.value} 
-                                  className="tw-p-3 tw-text-sm hover:tw-bg-slate-50 tw-cursor-pointer tw-text-slate-700 tw-border-b tw-border-slate-50 last:tw-border-0"
-                                  onClick={() => { onChange(opt.value); setIsOpen(false); setQuery(''); }}
-                              >
-                                  {opt.label}
-                              </div>
-                          ))
+                          filteredOptions.map(opt => <div key={opt.value} className="tw-p-3 tw-text-sm hover:tw-bg-slate-50 tw-cursor-pointer tw-text-slate-700 tw-border-b tw-border-slate-50 last:tw-border-0" onClick={() => { onChange(opt.value); setIsOpen(false); setQuery(''); }}>{opt.label}</div>)
                       )}
                   </div>
               )}
@@ -171,15 +156,11 @@
       );
   }
 
-  // =========================
-  // STEP 1: SETUP SCREEN
-  // =========================
   function SetupScreen({ clients, onComplete }) {
       const [pricingModel, setPricingModel] = useState('nett');
       const [selectedClientId, setSelectedClientId] = useState("");
       const [customCompany, setCustomCompany] = useState("");
-      
-      const clientOptions = clients.map(c => ({ value: c.id, label: `${c.first_name} ${c.last_name}` }));
+      const clientOptions = clients.map(c => ({ value: c.id, label: `${c.first_name || ''} ${c.last_name || ''}`.trim() }));
 
       useEffect(() => {
           if(selectedClientId) {
@@ -191,10 +172,7 @@
       const handleSubmit = (e) => {
           e.preventDefault();
           const clientData = clients.find(c => String(c.id) === String(selectedClientId));
-          onComplete({ 
-            pricingModel, 
-            clientDetails: clientData ? { name: `${clientData.first_name} ${clientData.last_name}`, company: customCompany, email: clientData.email } : { name: '', company: '' }
-          });
+          onComplete({ pricingModel, clientDetails: clientData ? { name: `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim(), company: customCompany, email: clientData.email } : { name: '', company: '' } });
       };
 
       return (
@@ -202,7 +180,6 @@
               <div className="tw-w-full tw-max-w-3xl tw-mx-auto">
                   <form onSubmit={handleSubmit} className="tw-space-y-6">
                       <div className="tw-bg-white tw-p-8 sm:tw-p-10 tw-rounded-2xl tw-shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw-border tw-border-slate-100 tw-space-y-10">
-                          
                           <div>
                               <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">1. Choose Pricing Model</label>
                               <div className="tw-grid tw-grid-cols-2 tw-gap-6">
@@ -218,32 +195,17 @@
                                   </div>
                               </div>
                           </div>
-
                           <div>
                               <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">2. Select Client</label>
                               <div className="tw-space-y-5">
                                   <div>
                                       <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">Client Name</label>
-                                      <SearchableSelect 
-                                          options={clientOptions}
-                                          value={selectedClientId}
-                                          onChange={setSelectedClientId}
-                                          placeholder="Search for a client..."
-                                          icon={<UserIcon size={16} />}
-                                          emptyLabel="+ Add new client"
-                                      />
+                                      <SearchableSelect options={clientOptions} value={selectedClientId} onChange={setSelectedClientId} placeholder="Search for a client..." icon={<UserIcon size={16} />} emptyLabel="+ Add new client" />
                                   </div>
-                                  <InputField 
-                                      icon={<Briefcase size={16}/>} 
-                                      label="Client Company (Optional)" 
-                                      value={customCompany}
-                                      onChange={(e) => setCustomCompany(e.target.value)}
-                                      placeholder="Enter company name" 
-                                  />
+                                  <InputField icon={<Briefcase size={16}/>} label="Client Company (Optional)" value={customCompany} onChange={(e) => setCustomCompany(e.target.value)} placeholder="Enter company name" />
                               </div>
                           </div>
                       </div>
-
                       <button type="submit" disabled={!selectedClientId} className="tw-w-full tw-flex tw-items-center tw-justify-center tw-gap-2 tw-bg-[#0b0e2c] tw-text-white tw-font-semibold tw-py-4 tw-px-4 tw-rounded-xl hover:tw-opacity-90 tw-transition-opacity disabled:tw-opacity-50 disabled:tw-cursor-not-allowed tw-text-lg tw-shadow-md">
                           Prepare invoice <ArrowRight size={20} />
                       </button>
@@ -253,21 +215,13 @@
       );
   }
 
-  // =========================
-  // STEP 2: INVOICE BUILDER
-  // =========================
   function InvoiceGenerator({ setupData, suppliers }) {
-      const [items, setItems] = useState([
-          { id: Date.now(), supplierId: "", category: "Hotel", description: '', nettUnitCost: 0, quantity: 1, markup: 20 }
-      ]);
-      
+      const [items, setItems] = useState([{ id: Date.now(), supplierId: "", category: "Hotel", description: '', nettUnitCost: 0, quantity: 1, markup: 20 }]);
       const [companyLogoUrl, setCompanyLogoUrl] = useState('https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/656cb820cffdc2c79973770f_Group%202.png');
       const [quoteInfo, setQuoteInfo] = useState({ number: `Q-${Date.now().toString().slice(-6)}`, date: new Date().toISOString().split('T')[0], dueDate: '' });
-      
       const [currencySettings, setCurrencySettings] = useState({ base: 'USD', client: 'EUR', rate: 0.93 });
       const [fees, setFees] = useState({ creditCardFee: 0, otherFees: 0, isUKPackage: false });
       const [creditCardFeeInclusion, setCreditCardFeeInclusion] = useState('included'); 
-      
       const [invoiceView, setInvoiceView] = useState('detailed');
       const [summaryNotes, setSummaryNotes] = useState('Your complete travel package includes all flights, accommodation, and transfers as discussed.');
       const [depositType, setDepositType] = useState('amount');
@@ -812,7 +766,12 @@
           return <SetupScreen clients={dbData.clients} onComplete={(data) => { setSetupData(data); setView('invoice'); }} />;
       }
       
-      return <InvoiceGenerator setupData={setupData} suppliers={dbData.suppliers} />;
+      // Wrapped the second screen in the Error Boundary
+      return (
+          <ErrorBoundary>
+              <InvoiceGenerator setupData={setupData} suppliers={dbData.suppliers} />
+          </ErrorBoundary>
+      );
   }
 
   // Mount App
