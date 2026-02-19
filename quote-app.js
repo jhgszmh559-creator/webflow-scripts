@@ -1,11 +1,3 @@
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
-
-<script type="text/babel">
 (() => {
   const { useState, useEffect, useMemo, useRef } = React;
 
@@ -155,7 +147,6 @@
       </div> 
   );
 
-  // ---> THE MISSING CURRENCY SELECTOR IS BACK <---
   const CurrencySelector = ({ label, ...props }) => ( 
       <div> 
           <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label> 
@@ -872,4 +863,3 @@
       root.render(<App />);
   }
 })();
-</script>
