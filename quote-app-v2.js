@@ -106,15 +106,19 @@
   // =========================
   // REUSABLE UI COMPONENTS
   // =========================
-  const ControlCard = ({ title, children, defaultOpen = true }) => {
+  const ControlCard = ({ title, children, defaultOpen = true, isComplete = false }) => {
       const [isOpen, setIsOpen] = useState(defaultOpen);
+      
       return (
-          <div className="tw-bg-white tw-rounded-xl tw-shadow-sm tw-border tw-border-slate-200 tw-overflow-hidden"> 
+          <div className={`tw-bg-white tw-rounded-xl tw-shadow-sm tw-border ${isComplete ? 'tw-border-emerald-500' : 'tw-border-slate-200'} tw-overflow-hidden tw-transition-colors tw-duration-300`}> 
               <div 
                   className="tw-p-6 tw-flex tw-justify-between tw-items-center tw-cursor-pointer hover:tw-bg-slate-50 tw-transition-colors"
                   onClick={() => setIsOpen(!isOpen)}
               >
-                  <h2 className="tw-text-xl tw-font-bold tw-text-slate-800">{title}</h2>
+                  <div className="tw-flex tw-items-center tw-gap-3">
+                      <h2 className="tw-text-xl tw-font-bold tw-text-slate-800">{title}</h2>
+                      {isComplete && <span className="tw-w-2.5 tw-h-2.5 tw-bg-emerald-500 tw-rounded-full" title="Complete"></span>}
+                  </div>
                   <div className="tw-text-slate-400">
                       {isOpen ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
                   </div>
@@ -149,7 +153,6 @@
       </div> 
   );
 
-  // HERE IS THE MISSING CURRENCY SELECTOR
   const CurrencySelector = ({ label, ...props }) => ( 
       <div> 
           <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label> 
@@ -214,25 +217,27 @@
   // =========================
   // STEP 1: SETUP SCREEN
   // =========================
-  function SetupScreen({ clients, onComplete }) {
-      const [pricingModel, setPricingModel] = useState('nett');
-      const [selectedClientId, setSelectedClientId] = useState("");
-      const [customCompany, setCustomCompany] = useState("");
+  function SetupScreen({ clients, onComplete, initialData }) {
+      const [pricingModel, setPricingModel] = useState(initialData?.pricingModel || 'nett');
+      const [selectedClientId, setSelectedClientId] = useState(initialData?.clientId || "");
+      const [customCompany, setCustomCompany] = useState(initialData?.clientDetails?.company || "");
       
       const clientOptions = clients.map(c => ({ value: c.id, label: `${c.first_name || ''} ${c.last_name || ''}`.trim() }));
 
+      // Auto-fill company logic
       useEffect(() => {
-          if(selectedClientId) {
+          if (selectedClientId && (!initialData || selectedClientId !== initialData.clientId)) {
               const client = clients.find(c => String(c.id) === String(selectedClientId));
-              if(client && client.company) setCustomCompany(client.company);
+              if (client && client.company) setCustomCompany(client.company);
           }
-      }, [selectedClientId, clients]);
+      }, [selectedClientId, clients, initialData]);
 
       const handleSubmit = (e) => {
           e.preventDefault();
           const clientData = clients.find(c => String(c.id) === String(selectedClientId));
           onComplete({ 
             pricingModel, 
+            clientId: selectedClientId,
             clientDetails: clientData ? { name: `${clientData.first_name || ''} ${clientData.last_name || ''}`.trim(), company: customCompany, email: clientData.email } : { name: '', company: '' }
           });
       };
@@ -246,12 +251,12 @@
                           <div>
                               <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">1. Choose Pricing Model</label>
                               <div className="tw-grid tw-grid-cols-2 tw-gap-6">
-                                  <div onClick={() => setPricingModel('nett')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'nett' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-slate-50/50 tw-border-slate-200 hover:tw-border-slate-300'}`}>
+                                  <div onClick={() => setPricingModel('nett')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'nett' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-white tw-border-[#303350]/30 hover:tw-border-[#303350]/60'}`}>
                                       <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'nett' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Nett Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the cost to you (nett) and add your markup.</p>
                                   </div>
-                                  <div onClick={() => setPricingModel('gross')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'gross' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-slate-50/50 tw-border-slate-200 hover:tw-border-slate-300'}`}>
+                                  <div onClick={() => setPricingModel('gross')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'gross' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-white tw-border-[#303350]/30 hover:tw-border-[#303350]/60'}`}>
                                       <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'gross' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Gross Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the final client price (gross) and your commission.</p>
@@ -296,7 +301,7 @@
   // =========================
   // STEP 2: INVOICE BUILDER
   // =========================
-  function InvoiceGenerator({ setupData, suppliers }) {
+  function InvoiceGenerator({ setupData, suppliers, onBack }) {
       const [items, setItems] = useState([
           { id: Date.now(), supplierId: "", category: "Hotel", description: '', nettUnitCost: 0, quantity: 1, markup: 20 }
       ]);
@@ -318,6 +323,16 @@
 
       const { pricingModel } = setupData;
       const supplierOptions = suppliers.map(s => ({ value: s.id, label: s.name }));
+
+      // Section Completion Checks (For Green Borders)
+      const isBrandingComplete = !!companyLogoUrl;
+      const isDetailsComplete = !!quoteInfo.number && !!quoteInfo.date;
+      const isDisplayComplete = invoiceView === 'detailed' || !!summaryNotes;
+      const isCurrencyComplete = !!currencySettings.base && !!currencySettings.client && !!currencySettings.rate;
+      const isTravelComplete = items.length > 0 && items.every(i => i.description && i.quantity > 0 && i.nettUnitCost >= 0);
+      const isFeesComplete = true; // Always considered complete as they are optional
+      const isPaymentsComplete = depositValue !== null && depositValue !== '';
+      const isBankComplete = !!bankDetails;
 
       const handleAddItem = () => setItems([...items, { id: Date.now(), supplierId: "", category: "Hotel", description: '', nettUnitCost: 0, quantity: 1, markup: 20 }]);
       const handleUpdateItem = (id, field, value) => {
@@ -515,7 +530,7 @@
               filename: `${quoteInfo.number || 'invoice'}.pdf`,
               image: { type: "jpeg", quality: 1 },
               html2canvas: { scale: 2, useCORS: true },
-              jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+              jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
           };
 
           await window.html2pdf().set(opt).from(tempContainer).save();
@@ -536,14 +551,17 @@
                   {/* Left Controls */}
                   <div className="lg:tw-col-span-2 tw-space-y-6">
                       
-                      <ControlCard title="Branding" defaultOpen={false}>
+                      <button onClick={onBack} className="tw-flex tw-items-center tw-gap-2 tw-text-slate-500 hover:tw-text-[#303350] tw-font-medium tw-transition-colors tw-mb-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tw-rotate-180"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                          Back to Setup
+                      </button>
+
+                      <ControlCard title="Branding" defaultOpen={false} isComplete={isBrandingComplete}>
                           <InputField label="Company Logo URL" value={companyLogoUrl} onChange={(e) => setCompanyLogoUrl(e.target.value)} placeholder="https://your-website.com/logo.png" />
                       </ControlCard>
 
-                      <ControlCard title="Details">
+                      <ControlCard title="Details" defaultOpen={true} isComplete={isDetailsComplete}>
                           <div className="tw-space-y-4">
-                              <InputField icon={<UserIcon size={16}/>} label="Client Name" value={setupData.clientDetails.name} disabled />
-                              <InputField icon={<Briefcase size={16}/>} label="Client Company (Optional)" value={setupData.clientDetails.company} disabled />
                               <div className="tw-grid tw-grid-cols-2 tw-gap-4">
                                   <InputField icon={<Hash size={16}/>} label="Invoice #" value={quoteInfo.number} onChange={(e) => setQuoteInfo({...quoteInfo, number: e.target.value})} />
                                   <InputField icon={<Calendar size={16}/>} label="Invoice Date" type="date" value={quoteInfo.date} onChange={(e) => setQuoteInfo({...quoteInfo, date: e.target.value})} />
@@ -554,7 +572,7 @@
                           </div>
                       </ControlCard>
 
-                      <ControlCard title="Display Options" defaultOpen={false}>
+                      <ControlCard title="Display Options" defaultOpen={false} isComplete={isDisplayComplete}>
                           <div className="tw-flex tw-items-center tw-justify-between">
                               <label className="tw-text-sm tw-font-medium tw-text-slate-700">Invoice View</label>
                               <div className="tw-flex tw-items-center tw-gap-3">
@@ -573,7 +591,7 @@
                           )}
                       </ControlCard>
 
-                      <ControlCard title="Currency & Exchange Rate" defaultOpen={false}>
+                      <ControlCard title="Currency & Exchange Rate" defaultOpen={false} isComplete={isCurrencyComplete}>
                           <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4 tw-items-end">
                               <CurrencySelector label="Nett Cost Currency" value={currencySettings.base} onChange={(e) => setCurrencySettings({...currencySettings, base: e.target.value})} />
                               <CurrencySelector label="Client Invoice Currency" value={currencySettings.client} onChange={(e) => setCurrencySettings({...currencySettings, client: e.target.value})} />
@@ -584,38 +602,37 @@
                           </div>
                       </ControlCard>
 
-                      <ControlCard title={`Travel Services (${calculations.baseCurrency.code} Pricing)`}>
+                      <ControlCard title={`Travel Services (${calculations.baseCurrency.code} Pricing)`} isComplete={isTravelComplete}>
                           <div className="tw-space-y-4">
                               {items.map((item) => (
-                                  <div key={item.id} className="tw-bg-slate-50/80 tw-p-4 tw-rounded-xl tw-border tw-border-slate-200">
-                                      <div className="tw-flex tw-justify-between tw-items-start tw-mb-3">
-                                          <div className="tw-flex-grow tw-mr-2">
-                                              <div className="tw-grid tw-grid-cols-2 tw-gap-2">
-                                                  <div>
-                                                      <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Category</label>
-                                                      <select 
-                                                          className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md tw-bg-white tw-text-sm focus:tw-ring-[#303350]"
-                                                          value={item.category}
-                                                          onChange={(e) => handleUpdateItem(item.id, 'category', e.target.value)}
-                                                      >
-                                                          {Object.keys(CATEGORIES).map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                                      </select>
-                                                  </div>
-                                                  <div>
-                                                      <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Supplier (optional)</label>
-                                                      <SearchableSelect 
-                                                          options={supplierOptions}
-                                                          value={item.supplierId}
-                                                          onChange={(val) => handleUpdateItem(item.id, 'supplierId', val)}
-                                                          placeholder="Search supplier..."
-                                                          emptyLabel="+ Add new supplier"
-                                                      />
-                                                  </div>
-                                              </div>
-                                          </div>
-                                          <button onClick={() => handleDeleteItem(item.id)} className="tw-mt-5 tw-p-2 tw-text-slate-400 hover:tw-text-red-600 hover:tw-bg-red-50 tw-rounded-md tw-transition-colors">
+                                  <div key={item.id} className="tw-bg-slate-50/80 tw-p-4 tw-rounded-xl tw-border tw-border-slate-200 tw-relative">
+                                      
+                                      <div className="tw-flex tw-justify-between tw-items-center tw-mb-3">
+                                          <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500">Category</label>
+                                          <button onClick={() => handleDeleteItem(item.id)} className="tw-text-slate-300 hover:tw-text-red-500 tw-transition-colors tw-p-1 -tw-m-1" title="Delete Item">
                                               <Trash2 size={18} />
                                           </button>
+                                      </div>
+                                      
+                                      <div className="tw-space-y-3 tw-mb-4">
+                                          <select 
+                                              className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md tw-bg-white tw-text-sm focus:tw-ring-[#303350]"
+                                              value={item.category}
+                                              onChange={(e) => handleUpdateItem(item.id, 'category', e.target.value)}
+                                          >
+                                              {Object.keys(CATEGORIES).map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                                          </select>
+
+                                          <div>
+                                              <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Supplier (optional)</label>
+                                              <SearchableSelect 
+                                                  options={supplierOptions}
+                                                  value={item.supplierId}
+                                                  onChange={(val) => handleUpdateItem(item.id, 'supplierId', val)}
+                                                  placeholder="Search supplier..."
+                                                  emptyLabel="+ Add new supplier"
+                                              />
+                                          </div>
                                       </div>
 
                                       <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Description</label>
@@ -641,7 +658,7 @@
                           </div>
                       </ControlCard>
 
-                      <ControlCard title="Additional Fees" defaultOpen={false}>
+                      <ControlCard title="Additional Fees" defaultOpen={false} isComplete={isFeesComplete}>
                           <div className="tw-space-y-4">
                               <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-bg-slate-50 tw-rounded-lg tw-border tw-border-slate-200">
                                   <label htmlFor="isUKPackage" className="tw-text-sm tw-font-medium tw-text-slate-700">UK Package trip? (adds 1% FFI)</label>
@@ -664,7 +681,7 @@
                           </div>
                       </ControlCard>
 
-                      <ControlCard title="Payments" defaultOpen={false}>
+                      <ControlCard title="Payments" defaultOpen={false} isComplete={isPaymentsComplete}>
                           <div className="tw-flex tw-items-center tw-justify-between tw-mb-4">
                               <label className="tw-text-sm tw-font-medium tw-text-slate-700">Deposit Type</label>
                               <div className="tw-flex tw-items-center tw-gap-3">
@@ -678,7 +695,7 @@
                           <InputField label="Deposit Due" type="number" value={depositValue} onChange={(e) => setDepositValue(parseFloat(e.target.value) || 0)} icon={depositType === 'amount' ? <span>{calculations.clientCurrency.symbol}</span> : null} symbol={depositType === 'percentage' ? '%' : null} />
                       </ControlCard>
 
-                      <ControlCard title="Bank Details" defaultOpen={false}>
+                      <ControlCard title="Bank Details" defaultOpen={false} isComplete={isBankComplete}>
                           <div className="tw-space-y-4">
                               <div>
                                   <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">Account Preset</label>
@@ -841,21 +858,37 @@
             src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/65afedc751a231c6ae634164_Animation%20-%201706028438496.json" 
             background="transparent" 
             speed="1" 
-            style={{ width: '450px', height: '450px' }} 
+            style={{ width: '900px', height: '900px', maxWidth: '100%' }} 
             loop 
             autoplay>
           </lottie-player>
         </div>
       );
 
-      if (view === 'setup') {
-          return <SetupScreen clients={dbData.clients} onComplete={(data) => { setSetupData(data); setView('invoice'); }} />;
-      }
-      
       return (
-          <ErrorBoundary>
-              <InvoiceGenerator setupData={setupData} suppliers={dbData.suppliers} />
-          </ErrorBoundary>
+          <>
+              {/* Keep setup mounted so we don't lose the selection when we hit back */}
+              <div style={{ display: view === 'setup' ? 'block' : 'none' }}>
+                  <SetupScreen 
+                      clients={dbData.clients} 
+                      initialData={setupData}
+                      onComplete={(data) => { setSetupData(data); setView('invoice'); }} 
+                  />
+              </div>
+
+              {/* Show Invoice Screen */}
+              {setupData && (
+                  <div style={{ display: view === 'invoice' ? 'block' : 'none' }}>
+                      <ErrorBoundary>
+                          <InvoiceGenerator 
+                              setupData={setupData} 
+                              suppliers={dbData.suppliers} 
+                              onBack={() => setView('setup')}
+                          />
+                      </ErrorBoundary>
+                  </div>
+              )}
+          </>
       );
   }
 
