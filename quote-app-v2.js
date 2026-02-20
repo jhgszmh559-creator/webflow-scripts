@@ -112,12 +112,11 @@
       return (
           <div className={`tw-bg-white tw-rounded-xl tw-shadow-sm tw-border ${isComplete ? 'tw-border-emerald-500' : 'tw-border-slate-200'} tw-overflow-hidden tw-transition-colors tw-duration-300`}> 
               <div 
-                  className="tw-p-6 tw-flex tw-justify-between tw-items-center tw-cursor-pointer hover:tw-bg-slate-50 tw-transition-colors"
+                  className="tw-p-6 tw-flex tw-justify-between tw-items-center tw-cursor-pointer tw-bg-white tw-transition-colors"
                   onClick={() => setIsOpen(!isOpen)}
               >
                   <div className="tw-flex tw-items-center tw-gap-3">
                       <h2 className="tw-text-xl tw-font-bold tw-text-slate-800">{title}</h2>
-                      {isComplete && <span className="tw-w-2.5 tw-h-2.5 tw-bg-emerald-500 tw-rounded-full" title="Complete"></span>}
                   </div>
                   <div className="tw-text-slate-400">
                       {isOpen ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
@@ -134,7 +133,7 @@
 
   const InputField = ({ label, symbol, icon, ...props }) => (
       <div>
-          <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label>
+          <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">{label}</label>
           <div className="tw-relative">
               {icon && <span className="tw-absolute tw-left-3 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400">{icon}</span>}
               <input {...props} className={`tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] disabled:tw-bg-slate-100 disabled:tw-cursor-not-allowed ${icon ? 'tw-pl-9' : ''} ${symbol ? 'tw-pr-9' : ''}`} />
@@ -145,7 +144,7 @@
 
   const MiniInputField = ({ label, symbol, ...props }) => ( 
       <div> 
-          <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500">{label}</label> 
+          <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700">{label}</label> 
           <div className="tw-relative tw-mt-1"> 
               {symbol && <span className={`tw-absolute tw-left-2 tw-top-1/2 tw--translate-y-1/2 tw-text-slate-400 ${symbol === '%' ? 'tw-right-2 tw-left-auto' : ''}`}>{symbol}</span>} 
               <input {...props} className={`tw-w-full tw-text-sm tw-p-1.5 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-1 focus:tw-ring-[#303350] focus:tw-border-[#303350] ${symbol && symbol !== '%' ? 'tw-pl-6' : ''} ${symbol === '%' ? 'tw-pr-6 tw-text-right' : ''}`} /> 
@@ -155,7 +154,7 @@
 
   const CurrencySelector = ({ label, ...props }) => ( 
       <div> 
-          <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">{label}</label> 
+          <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">{label}</label> 
           <select {...props} className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350] tw-bg-white"> 
               {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)} 
           </select> 
@@ -224,7 +223,6 @@
       
       const clientOptions = clients.map(c => ({ value: c.id, label: `${c.first_name || ''} ${c.last_name || ''}`.trim() }));
 
-      // Auto-fill company logic
       useEffect(() => {
           if (selectedClientId && (!initialData || selectedClientId !== initialData.clientId)) {
               const client = clients.find(c => String(c.id) === String(selectedClientId));
@@ -249,14 +247,14 @@
                       <div className="tw-bg-white tw-p-8 sm:tw-p-10 tw-rounded-2xl tw-shadow-[0_8px_30px_rgb(0,0,0,0.04)] tw-border tw-border-slate-100 tw-space-y-10">
                           
                           <div>
-                              <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">1. Choose Pricing Model</label>
+                              <label className="tw-block tw-text-[18px] tw-font-bold tw-text-slate-800 tw-mb-4">1. Choose Pricing Model</label>
                               <div className="tw-grid tw-grid-cols-2 tw-gap-6">
-                                  <div onClick={() => setPricingModel('nett')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'nett' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-white tw-border-[#303350]/30 hover:tw-border-[#303350]/60'}`}>
+                                  <div onClick={() => setPricingModel('nett')} className={`tw-p-5 tw-rounded-xl tw-border tw-cursor-pointer tw-transition-all ${pricingModel === 'nett' ? 'tw-bg-slate-50 tw-border-[#303350] tw-shadow-sm' : 'tw-bg-white tw-border-slate-200 hover:tw-border-slate-300'}`}>
                                       <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'nett' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Nett Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the cost to you (nett) and add your markup.</p>
                                   </div>
-                                  <div onClick={() => setPricingModel('gross')} className={`tw-p-5 tw-rounded-xl tw-border-2 tw-cursor-pointer tw-transition-all ${pricingModel === 'gross' ? 'tw-bg-slate-50 tw-border-[#303350]' : 'tw-bg-white tw-border-[#303350]/30 hover:tw-border-[#303350]/60'}`}>
+                                  <div onClick={() => setPricingModel('gross')} className={`tw-p-5 tw-rounded-xl tw-border tw-cursor-pointer tw-transition-all ${pricingModel === 'gross' ? 'tw-bg-slate-50 tw-border-[#303350] tw-shadow-sm' : 'tw-bg-white tw-border-slate-200 hover:tw-border-slate-300'}`}>
                                       <img src="https://cdn.prod.website-files.com/656cafcf92ee678d635ab3dd/6611ac28353fd48ae22ce9e5_arrow%20right.png" className="icon tw-w-6 tw-h-6 tw-mb-3" alt="icon" />
                                       <h3 className={`heading-h3-size tw-mb-2 ${pricingModel === 'gross' ? 'tw-text-[#303350]' : 'tw-text-slate-700'}`}>Gross Pricing</h3>
                                       <p className="tw-text-sm tw-text-slate-500">Enter the final client price (gross) and your commission.</p>
@@ -265,10 +263,10 @@
                           </div>
 
                           <div>
-                              <label className="heading-h4-size tw-block tw-text-slate-700 tw-mb-4">2. Select Client</label>
+                              <label className="tw-block tw-text-[18px] tw-font-bold tw-text-slate-800 tw-mb-4">2. Select Client</label>
                               <div className="tw-space-y-5">
                                   <div>
-                                      <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">Client Name</label>
+                                      <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">Client Name</label>
                                       <SearchableSelect 
                                           options={clientOptions}
                                           value={selectedClientId}
@@ -551,7 +549,12 @@
                   {/* Left Controls */}
                   <div className="lg:tw-col-span-2 tw-space-y-6">
                       
-                      <button onClick={onBack} className="tw-flex tw-items-center tw-gap-2 tw-text-slate-500 hover:tw-text-[#303350] tw-font-medium tw-transition-colors tw-mb-2">
+                      <button 
+                          type="button" 
+                          onClick={onBack} 
+                          style={{ backgroundColor: 'transparent' }}
+                          className="tw-flex tw-items-center tw-gap-2 tw-text-slate-500 hover:tw-text-[#303350] tw-font-medium tw-transition-colors tw-border-none tw-shadow-none tw-p-0"
+                      >
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tw-rotate-180"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                           Back to Setup
                       </button>
@@ -574,10 +577,10 @@
 
                       <ControlCard title="Display Options" defaultOpen={false} isComplete={isDisplayComplete}>
                           <div className="tw-flex tw-items-center tw-justify-between">
-                              <label className="tw-text-sm tw-font-medium tw-text-slate-700">Invoice View</label>
+                              <label className="tw-text-[18px] tw-font-medium tw-text-slate-700">Invoice View</label>
                               <div className="tw-flex tw-items-center tw-gap-3">
                                   <span className={`tw-text-sm tw-font-medium ${invoiceView === 'summary' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Summary</span>
-                                  <button onClick={() => setInvoiceView(prev => prev === 'detailed' ? 'summary' : 'detailed')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${invoiceView === 'detailed' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
+                                  <button type="button" onClick={() => setInvoiceView(prev => prev === 'detailed' ? 'summary' : 'detailed')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${invoiceView === 'detailed' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
                                       <span className={`tw-pointer-events-none tw-inline-block tw-h-5 tw-w-5 tw-transform tw-rounded-full tw-bg-white tw-shadow tw-ring-0 tw-transition tw-duration-200 tw-ease-in-out ${invoiceView === 'detailed' ? 'tw-translate-x-5' : 'tw-translate-x-0'}`} />
                                   </button>
                                   <span className={`tw-text-sm tw-font-medium ${invoiceView === 'detailed' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Detailed</span>
@@ -585,7 +588,7 @@
                           </div>
                           {invoiceView === 'summary' && ( 
                               <div className="tw-mt-4"> 
-                                  <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-700 tw-mb-1">Summary Description</label> 
+                                  <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">Summary Description</label> 
                                   <textarea rows="3" className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-2 focus:tw-ring-[#303350] focus:tw-border-[#303350]" value={summaryNotes} onChange={(e) => setSummaryNotes(e.target.value)} placeholder="Enter a custom description..." /> 
                               </div> 
                           )}
@@ -605,16 +608,22 @@
                       <ControlCard title={`Travel Services (${calculations.baseCurrency.code} Pricing)`} isComplete={isTravelComplete}>
                           <div className="tw-space-y-4">
                               {items.map((item) => (
-                                  <div key={item.id} className="tw-bg-slate-50/80 tw-p-4 tw-rounded-xl tw-border tw-border-slate-200 tw-relative">
+                                  <div key={item.id} className="tw-bg-slate-50/80 tw-p-4 tw-rounded-xl tw-border tw-border-slate-200">
                                       
                                       <div className="tw-flex tw-justify-between tw-items-center tw-mb-3">
-                                          <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500">Category</label>
-                                          <button onClick={() => handleDeleteItem(item.id)} className="tw-text-slate-300 hover:tw-text-red-500 tw-transition-colors tw-p-1 -tw-m-1" title="Delete Item">
-                                              <Trash2 size={18} />
+                                          <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-0">Category</label>
+                                          <button 
+                                              type="button" 
+                                              onClick={() => handleDeleteItem(item.id)} 
+                                              className="tw-flex tw-items-center tw-justify-center tw-text-[#303350] hover:tw-text-red-500 hover:tw-bg-red-50 tw-p-1 tw-rounded tw-transition-colors" 
+                                              style={{ background: 'transparent', border: 'none' }}
+                                              title="Delete Item"
+                                          >
+                                              <Trash2 size={20} />
                                           </button>
                                       </div>
-                                      
-                                      <div className="tw-space-y-3 tw-mb-4">
+
+                                      <div className="tw-space-y-4 tw-mb-4">
                                           <select 
                                               className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md tw-bg-white tw-text-sm focus:tw-ring-[#303350]"
                                               value={item.category}
@@ -624,7 +633,7 @@
                                           </select>
 
                                           <div>
-                                              <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Supplier (optional)</label>
+                                              <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">Supplier (optional)</label>
                                               <SearchableSelect 
                                                   options={supplierOptions}
                                                   value={item.supplierId}
@@ -635,7 +644,7 @@
                                           </div>
                                       </div>
 
-                                      <label className="tw-block tw-text-xs tw-font-medium tw-text-slate-500 tw-mb-1">Description</label>
+                                      <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">Description</label>
                                       <input type="text" placeholder="e.g. 5 nights at Capella Bangkok" value={item.description} onChange={(e) => handleUpdateItem(item.id, 'description', e.target.value)} className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md tw-mb-4 focus:tw-ring-[#303350] focus:tw-border-[#303350]" />
                                       
                                       <div className="tw-grid tw-grid-cols-3 tw-gap-3">
@@ -652,7 +661,7 @@
                                       </div>
                                   </div>
                               ))}
-                              <button onClick={handleAddItem} className="tw-w-full tw-flex tw-items-center tw-justify-center tw-gap-2 tw-bg-slate-100 tw-text-slate-700 tw-border tw-border-slate-300 tw-py-3 tw-rounded-xl tw-font-semibold hover:tw-bg-slate-200 tw-transition-colors">
+                              <button type="button" onClick={handleAddItem} className="tw-w-full tw-flex tw-items-center tw-justify-center tw-gap-2 tw-bg-slate-100 tw-text-slate-700 tw-border tw-border-slate-300 tw-py-3 tw-rounded-xl tw-font-semibold hover:tw-bg-slate-200 tw-transition-colors">
                                   <Plus size={18} /> Add Service
                               </button>
                           </div>
@@ -661,14 +670,14 @@
                       <ControlCard title="Additional Fees" defaultOpen={false} isComplete={isFeesComplete}>
                           <div className="tw-space-y-4">
                               <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-bg-slate-50 tw-rounded-lg tw-border tw-border-slate-200">
-                                  <label htmlFor="isUKPackage" className="tw-text-sm tw-font-medium tw-text-slate-700">UK Package trip? (adds 1% FFI)</label>
+                                  <label htmlFor="isUKPackage" className="tw-text-[18px] tw-font-medium tw-text-slate-700">UK Package trip? (adds 1% FFI)</label>
                                   <input id="isUKPackage" name="isUKPackage" type="checkbox" checked={fees.isUKPackage} onChange={handleFeeChange} className="tw-h-5 tw-w-5 tw-text-[#303350] tw-rounded tw-border-gray-300 focus:tw-ring-[#303350]" />
                               </div>
                               <div className="tw-flex tw-items-center tw-justify-between">
-                                  <label className="tw-text-sm tw-font-medium tw-text-slate-700">Credit Card Fee</label>
+                                  <label className="tw-text-[18px] tw-font-medium tw-text-slate-700">Credit Card Fee</label>
                                   <div className="tw-flex tw-items-center tw-gap-3">
                                       <span className={`tw-text-sm tw-font-medium ${creditCardFeeInclusion === 'separate' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Separate</span>
-                                      <button onClick={() => setCreditCardFeeInclusion(prev => prev === 'included' ? 'separate' : 'included')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${creditCardFeeInclusion === 'included' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
+                                      <button type="button" onClick={() => setCreditCardFeeInclusion(prev => prev === 'included' ? 'separate' : 'included')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${creditCardFeeInclusion === 'included' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
                                           <span className={`tw-pointer-events-none tw-inline-block tw-h-5 tw-w-5 tw-transform tw-rounded-full tw-bg-white tw-shadow tw-ring-0 tw-transition tw-duration-200 tw-ease-in-out ${creditCardFeeInclusion === 'included' ? 'tw-translate-x-5' : 'tw-translate-x-0'}`} />
                                       </button>
                                       <span className={`tw-text-sm tw-font-medium ${creditCardFeeInclusion === 'included' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Included</span>
@@ -683,10 +692,10 @@
 
                       <ControlCard title="Payments" defaultOpen={false} isComplete={isPaymentsComplete}>
                           <div className="tw-flex tw-items-center tw-justify-between tw-mb-4">
-                              <label className="tw-text-sm tw-font-medium tw-text-slate-700">Deposit Type</label>
+                              <label className="tw-text-[18px] tw-font-medium tw-text-slate-700">Deposit Type</label>
                               <div className="tw-flex tw-items-center tw-gap-3">
                                   <span className={`tw-text-sm tw-font-medium ${depositType === 'percentage' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Percentage</span>
-                                  <button onClick={() => setDepositType(prev => prev === 'amount' ? 'percentage' : 'amount')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${depositType === 'amount' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
+                                  <button type="button" onClick={() => setDepositType(prev => prev === 'amount' ? 'percentage' : 'amount')} className={`tw-relative tw-inline-flex tw-h-6 tw-w-11 tw-flex-shrink-0 tw-cursor-pointer tw-rounded-full tw-border-2 tw-border-transparent tw-transition-colors tw-duration-200 tw-ease-in-out focus:tw-outline-none ${depositType === 'amount' ? 'tw-bg-[#303350]' : 'tw-bg-gray-200'}`}>
                                       <span className={`tw-pointer-events-none tw-inline-block tw-h-5 tw-w-5 tw-transform tw-rounded-full tw-bg-white tw-shadow tw-ring-0 tw-transition tw-duration-200 tw-ease-in-out ${depositType === 'amount' ? 'tw-translate-x-5' : 'tw-translate-x-0'}`} />
                                   </button>
                                   <span className={`tw-text-sm tw-font-medium ${depositType === 'amount' ? 'tw-text-[#303350]' : 'tw-text-slate-500'}`}>Amount</span>
@@ -698,7 +707,7 @@
                       <ControlCard title="Bank Details" defaultOpen={false} isComplete={isBankComplete}>
                           <div className="tw-space-y-4">
                               <div>
-                                  <label className="tw-block tw-text-sm tw-font-medium tw-text-slate-600 tw-mb-1">Account Preset</label>
+                                  <label className="tw-block tw-text-[18px] tw-font-medium tw-text-slate-700 tw-mb-1">Account Preset</label>
                                   <select value={selectedBankPreset} onChange={handleBankPresetChange} className="tw-w-full tw-p-2 tw-border tw-border-slate-300 tw-rounded-md focus:tw-ring-[#303350] tw-bg-white">
                                       {PRESET_BANK_ACCOUNTS.map(preset => <option key={preset.id} value={preset.id}>{preset.name}</option>)}
                                       <option value="custom">Custom</option>
@@ -708,7 +717,7 @@
                           </div>
                       </ControlCard>
 
-                      <button onClick={downloadPdf} disabled={isExporting} className="tw-w-full tw-bg-[#0b0e2c] tw-text-white tw-py-4 tw-rounded-xl tw-font-semibold hover:tw-opacity-90 tw-transition-opacity tw-text-lg tw-shadow-md disabled:tw-opacity-50">
+                      <button type="button" onClick={downloadPdf} disabled={isExporting} className="tw-w-full tw-bg-[#0b0e2c] tw-text-white tw-py-4 tw-rounded-xl tw-font-semibold hover:tw-opacity-90 tw-transition-opacity tw-text-lg tw-shadow-md disabled:tw-opacity-50">
                           {isExporting ? 'Generating PDF...' : 'Export as PDF'}
                       </button>
                   </div>
