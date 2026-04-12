@@ -488,21 +488,23 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
           }
       };
 
-      const calculations = useMemo(() => {
+const calculations = useMemo(() => {
           const baseCurrency = CURRENCIES.find(c => c.code === currencySettings.base) || CURRENCIES[0];
           const clientCurrency = CURRENCIES.find(c => c.code === currencySettings.client) || CURRENCIES[0];
           const rate = currencySettings.rate;
 
+          // Multiplier applied to items if fee is "included"
+          const ccMultiplier = creditCardFeeInclusion === 'included' ? (1 + (fees.creditCardFee / 100)) : 1;
+
           const itemsNet = items.reduce((sum, item) => sum + (Number(item.nettUnitCost) * Number(item.quantity)), 0);
           const itemsMarkup = items.reduce((sum, item) => sum + ((Number(item.nettUnitCost) * Number(item.quantity)) * (Number(item.markup) / 100)), 0);
-          const itemsTotalBase = itemsNet + itemsMarkup;
+          const itemsTotalBase = (itemsNet + itemsMarkup) * ccMultiplier;
           
-          const otherFeesBase = fees.otherFees;
-          // Updated FFI calculation to 1.12%
+          const otherFeesBase = fees.otherFees * ccMultiplier;
           const ffiFeeBase = fees.isUKPackage ? (itemsTotalBase + otherFeesBase) * 0.0112 : 0;
           const totalBeforeCCBase = itemsTotalBase + otherFeesBase + ffiFeeBase;
           
-          // Only calculate CC fee base if it is set to separate
+          // Only calculate as a separate fee base if toggle is set to "separate"
           const ccFeeBase = creditCardFeeInclusion === 'separate' ? totalBeforeCCBase * (fees.creditCardFee / 100) : 0;
           
           let grandTotalBase = totalBeforeCCBase + ccFeeBase;
@@ -520,17 +522,17 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
       const moneyClient = (amount) => Number(amount).toLocaleString(undefined, { style: 'currency', currency: calculations.clientCurrency.code });
       const moneyBase = (amount) => Number(amount).toLocaleString(undefined, { style: 'currency', currency: calculations.baseCurrency.code });
 
-      const calculatedDepositAmount = useMemo(() => {
+const calculatedDepositAmount = useMemo(() => {
+          const ccMultiplier = creditCardFeeInclusion === 'included' ? (1 + (fees.creditCardFee / 100)) : 1;
           const fullDepositItemsClientTotal = items
               .filter(it => it.isFullDeposit)
               .reduce((sum, it) => {
-                  const itemPriceBase = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100)));
+                  const itemPriceBase = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * ccMultiplier;
                   const itemPriceClient = itemPriceBase * calculations.rate;
                   return sum + (itemPriceClient * Number(it.quantity));
               }, 0);
 
           if (depositType === 'amount') {
-              // Add fixed amount plus any 100% upfront items
               return depositValue + fullDepositItemsClientTotal;
           }
           
@@ -539,15 +541,17 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
               return (regularTotal * (depositValue / 100)) + fullDepositItemsClientTotal;
           }
           return 0;
-      }, [depositType, depositValue, calculations.grandTotal, items, calculations.rate]);
+      }, [depositType, depositValue, calculations.grandTotal, items, calculations.rate, creditCardFeeInclusion, fees.creditCardFee]);
 
-      const handlePrintPdf = () => {
+const handlePrintPdf = () => {
           setIsExporting(true);
           let tableRowsHTML = '';
           
+          const ccMultiplier = creditCardFeeInclusion === 'included' ? (1 + (fees.creditCardFee / 100)) : 1;
+          
           if (invoiceView === 'detailed') {
               tableRowsHTML = items.map(it => {
-                  const itemPriceBase = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100)));
+                  const itemPriceBase = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * ccMultiplier;
                   const itemPriceClient = itemPriceBase * calculations.rate;
                   const itemTotalClient = itemPriceClient * Number(it.quantity);
                   const supplierName = it.supplierId ? suppliers.find(s => String(s.id) === String(it.supplierId))?.name : '';
@@ -573,7 +577,7 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
           } else if (invoiceView === 'grouped') {
               const groupedTotals = items.reduce((acc, it) => {
                   if (!acc[it.category]) acc[it.category] = 0;
-                  const itemPriceClient = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * calculations.rate * Number(it.quantity);
+                  const itemPriceClient = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * ccMultiplier * calculations.rate * Number(it.quantity);
                   acc[it.category] += itemPriceClient;
                   return acc;
               }, {});
@@ -598,7 +602,7 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
               const supplierTotals = items.reduce((acc, it) => {
                   const supplierName = it.supplierId ? suppliers.find(s => String(s.id) === String(it.supplierId))?.name || 'Other Services' : 'Other Services';
                   if (!acc[supplierName]) acc[supplierName] = 0;
-                  const itemPriceClient = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * calculations.rate * Number(it.quantity);
+                  const itemPriceClient = (Number(it.nettUnitCost) * (1 + (Number(it.markup)/100))) * ccMultiplier * calculations.rate * Number(it.quantity);
                   acc[supplierName] += itemPriceClient;
                   return acc;
               }, {});
@@ -974,7 +978,7 @@ const handleSaveQuote = async () => {
                                           <MiniInputField label={pricingModel === 'nett' ? "Markup (%)" : "Commission (%)"} type="number" value={item.markup} onChange={(e) => handleUpdateItem(item.id, 'markup', e.target.value)} symbol="%" />
                                       </div>
                                       
-                                      <div className="tw-flex tw-items-center tw-justify-between tw-mt-4 tw-pt-4 tw-border-t tw-border-solid tw-border-slate-200/60">
+<div className="tw-flex tw-items-center tw-justify-between tw-mt-4 tw-pt-4 tw-border-t tw-border-solid tw-border-slate-200/60">
                                           <div className="tw-flex tw-items-center tw-gap-2">
                                               <input 
                                                   type="checkbox" 
@@ -986,7 +990,7 @@ const handleSaveQuote = async () => {
                                               <label htmlFor={`deposit-${item.id}`} className="tw-text-sm tw-font-medium tw-text-slate-600 tw-m-0 tw-cursor-pointer">Require 100% upfront as deposit</label>
                                           </div>
                                           <div className="tw-text-right tw-text-sm tw-font-semibold tw-text-[#303350]">
-                                              Line total (Base): {moneyBase((item.quantity * item.nettUnitCost) * (1 + (item.markup/100)))}
+                                              Line total (Base): {moneyBase((item.quantity * item.nettUnitCost) * (1 + (item.markup/100)) * (creditCardFeeInclusion === 'included' ? (1 + fees.creditCardFee/100) : 1))}
                                           </div>
                                       </div>
                                   </div>
@@ -1038,9 +1042,7 @@ const handleSaveQuote = async () => {
                                   </div>
                               </div>
 <div className="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-4">
-                                  {creditCardFeeInclusion === 'separate' && (
-                                      <InputField label="CC Fee (%)" name="creditCardFee" tooltipLink="https://drive.google.com/drive/u/3/folders/0ACXz2hC43zP7Uk9PVA" type="number" value={fees.creditCardFee} onChange={handleFeeChange} step="0.1" />
-                                  )}
+                                  <InputField label="CC Fee (%)" name="creditCardFee" tooltipLink="https://drive.google.com/drive/u/3/folders/0ACXz2hC43zP7Uk9PVA" type="number" value={fees.creditCardFee} onChange={handleFeeChange} step="0.1" />
                                   <InputField label={`Other Fees (${calculations.baseCurrency.symbol})`} name="otherFees" type="number" value={fees.otherFees} onChange={handleFeeChange} />
                               </div>
                           </div>
