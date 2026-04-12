@@ -498,8 +498,8 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
           const itemsTotalBase = itemsNet + itemsMarkup;
           
           const otherFeesBase = fees.otherFees;
-          // Updated FFI calculation from 1% to 1.25%
-          const ffiFeeBase = fees.isUKPackage ? (itemsTotalBase + otherFeesBase) * 0.0125 : 0;
+          // Updated FFI calculation to 1.12%
+          const ffiFeeBase = fees.isUKPackage ? (itemsTotalBase + otherFeesBase) * 0.0112 : 0;
           const totalBeforeCCBase = itemsTotalBase + otherFeesBase + ffiFeeBase;
           
           // Only calculate CC fee base if it is set to separate
@@ -624,7 +624,7 @@ const InputField = ({ label, symbol, icon, tooltipLink, ...props }) => (
 
           let feesHTML = '';
           if (fees.otherFees > 0) feesHTML += `<tr><td colspan="3" style="padding: 12px; text-align: right; font-size: 14px; color: #475569;">Other Fees</td><td style="padding: 12px; text-align: right; font-size: 14px; color: #0f172a;">${moneyClient(calculations.otherFees)}</td></tr>`;
-          if (fees.isUKPackage) feesHTML += `<tr><td colspan="3" style="padding: 12px; text-align: right; font-size: 14px; color: #475569; font-style: italic;">FFI Fee (1.25%)</td><td style="padding: 12px; text-align: right; font-size: 14px; color: #0f172a;">${moneyClient(calculations.ffiFee)}</td></tr>`;
+          if (fees.isUKPackage) feesHTML += `<tr><td colspan="3" style="padding: 12px; text-align: right; font-size: 14px; color: #475569; font-style: italic;">FFI Fee (1.12%)</td><td style="padding: 12px; text-align: right; font-size: 14px; color: #0f172a;">${moneyClient(calculations.ffiFee)}</td></tr>`;
           if (creditCardFeeInclusion === 'separate' && fees.creditCardFee > 0) feesHTML += `<tr><td colspan="3" style="padding: 12px; text-align: right; font-size: 14px; color: #475569;">Credit Card Fee (${fees.creditCardFee}%)</td><td style="padding: 12px; text-align: right; font-size: 14px; color: #0f172a;">${moneyClient(calculations.ccFee)}</td></tr>`;
 
           let depositHTML = '';
@@ -1024,7 +1024,7 @@ const handleSaveQuote = async () => {
                       <ControlCard title="Additional Fees" defaultOpen={false} isComplete={isFeesComplete}>
                           <div className="tw-space-y-4">
                               <div className="tw-flex tw-items-center tw-justify-between tw-p-3 tw-bg-slate-50 tw-rounded-lg tw-border tw-border-solid tw-border-slate-200">
-                                  <label htmlFor="isUKPackage" className="tw-text-sm tw-font-medium tw-text-slate-700 tw-m-0">UK Package trip? (adds 1.25% FFI)</label>
+                                  <label htmlFor="isUKPackage" className="tw-text-sm tw-font-medium tw-text-slate-700 tw-m-0">UK Package trip? (adds 1.12% FFI)</label>
                                   <input id="isUKPackage" name="isUKPackage" type="checkbox" checked={fees.isUKPackage} onChange={handleFeeChange} className="tw-h-5 tw-w-5 tw-text-[#303350] tw-rounded tw-border-gray-300 focus:tw-ring-[#303350]" />
                               </div>
                               <div className="tw-flex tw-items-center tw-justify-between">
