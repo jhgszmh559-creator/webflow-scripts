@@ -1004,10 +1004,10 @@ const handleSaveQuote = async () => {
                                       
                                       <div className="tw-grid tw-grid-cols-3 tw-gap-3 tw-items-end">
                                           <MiniInputField label={item.category === 'Hotel' ? "# nights" : "Qty"} type="number" value={item.quantity} onChange={(e) => handleUpdateItem(item.id, 'quantity', e.target.value)} />
-                                          {pricingModel === 'nett' ? (
+                                         {pricingModel === 'nett' ? (
                                               <MiniInputField label={item.category === 'Hotel' ? "Nett nightly cost" : "Nett Unit Cost"} type="number" value={item.nettUnitCost} onChange={(e) => handleUpdateItem(item.id, 'nettUnitCost', e.target.value)} symbol={calculations.baseCurrency.symbol} />
                                           ) : (
-                                              <MiniInputField label={item.category === 'Hotel' ? "Gross nightly price" : "Gross Unit Price"} type="number" value={item.grossUnitCost || (Number(item.nettUnitCost || 0)*(1+(Number(item.markup || 0)/100)))} onChange={(e) => handleUpdateItem(item.id, 'grossUnitCost', e.target.value)} symbol={calculations.baseCurrency.symbol} />
+                                              <MiniInputField label={item.category === 'Hotel' ? "Gross nightly price" : "Gross Unit Price"} type="number" value={item.grossUnitCost ?? (item.nettUnitCost ? (Number(item.nettUnitCost) * (1 + (Number(item.markup || 0) / 100))) : '')} onChange={(e) => handleUpdateItem(item.id, 'grossUnitCost', e.target.value)} symbol={calculations.baseCurrency.symbol} />
                                           )}
                                           <MiniInputField label={pricingModel === 'nett' ? "Markup (%)" : "Commission (%)"} type="number" value={item.markup} onChange={(e) => handleUpdateItem(item.id, 'markup', e.target.value)} symbol="%" />
                                       </div>
