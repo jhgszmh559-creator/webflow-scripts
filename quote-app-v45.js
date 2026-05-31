@@ -1142,8 +1142,8 @@ const handleSaveQuote = async () => {
                                   return (
                                       <div className="tw-mt-4 tw-rounded-xl tw-border tw-border-dashed tw-border-amber-300 tw-bg-amber-50/70 tw-p-4">
                                           <div className="tw-flex tw-items-center tw-gap-2 tw-mb-3">
-                                              <span className="tw-inline-flex tw-items-center tw-gap-1 tw-text-[11px] tw-font-bold tw-uppercase tw-tracking-wide tw-text-amber-700 tw-bg-amber-100 tw-px-2 tw-py-0.5 tw-rounded-full">Internal check</span>
-                                              <span className="tw-text-xs tw-text-amber-700/80 tw-m-0">Not shown on the quote/invoice</span>
+                                              <span className="tw-inline-flex tw-items-center tw-whitespace-nowrap tw-text-[11px] tw-font-bold tw-uppercase tw-tracking-wide tw-text-amber-700 tw-bg-amber-100 tw-px-2.5 tw-py-1 tw-rounded-full tw-leading-none">Internal</span>
+                                              <span className="tw-text-xs tw-text-amber-700/80 tw-m-0">Not shown on quote/invoice</span>
                                           </div>
                                           <div className="tw-grid tw-grid-cols-2 tw-gap-x-4 tw-gap-y-2 tw-text-sm">
                                               <span className="tw-text-slate-600">Total nett cost</span>
