@@ -250,10 +250,10 @@
             const remainingBalance = serviceData.balance_amount || 0;
 
             // Renders a bracketed sub-line converting an amount into the selected Payment
-            // Currency at our current FX rate, e.g. "($712.50 = €624.98)".
+            // Currency at our current FX rate, e.g. "(approx. €186.24)".
             // Returns '' when there's no rate / same currency. Display-only.
             const fxConvLine = (amount, fontSize = 12) => (fxRate && fxTargetCode && fxTargetCode !== clientCurrencyCode)
-                ? `<div style="font-size: ${fontSize}px; font-weight: normal; color: #94a3b8; margin-top: 4px;">(${moneyClient(amount)} = ${moneyPayment(amount * fxRate)})</div>`
+                ? `<div style="font-size: ${fontSize}px; font-weight: normal; color: #94a3b8; margin-top: 4px;">(approx. ${moneyPayment(amount * fxRate)})</div>`
                 : '';
 
             const depositDue = actualDeposit;
