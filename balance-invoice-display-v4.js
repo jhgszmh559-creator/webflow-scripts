@@ -206,9 +206,9 @@
 
             const currencyConfig = {
                 'GBP': {
-                    bankDetails: "Cartology Travel Ltd\nAddress: 17 Dorien Road, London, SW20 8EL\nBarclays Bank\nSort: 20-45-45\nAcc: 80285463\nIBAN: GB32BUKB20454580285463\nSwift: BUKBGB22",
+                    bankDetails: "Cartology Travel Ltd\nAddress: 17 Dorien Road, London, SW20 8EL\nBarclays Bank\nSort: 20-45-45\nAcc: 50675156\nIBAN: GB53BUKB20454550675156\nSwift: BUKBGB22\nBank Address: 1 Churchill Place, London, E14 5HP - United Kingdom",
                     paymentLink: "https://cartologytravel-gbp.flywire.com"
-                },
+             },
                 'EUR': {
                     bankDetails: "Cartology Travel Ltd\nSort: 20-45-45\nAcc: 56279911\nIBAN: GB10 BUKB 20454556279911",
                     paymentLink: "https://cartologytravel-eur.flywire.com"
